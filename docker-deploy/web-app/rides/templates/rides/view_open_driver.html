@@ -1,0 +1,49 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+
+  <h1>Open Rides Available</h1>
+  <div id="accordion1">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Seats Needed</th>
+                <th>Can Be Shared</th>
+                <th>Shared Passengers</th>
+                <th>Current Passengers</th>
+                <th>Vehicle Type</th>
+                <th>Special Requirements</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ride_request in ride_requests %}
+                <!--{% if ride_request.user != driver.user %}-->
+                  <tr>
+                    <td>{{ ride_request.origin }}</td>
+                    <td>{{ ride_request.destination }}</td>
+                    <td>{{ ride_request.date }}</td>
+                    <td>{{ ride_request.time }}</td>
+                    <td>{{ ride_request.seats_needed }}</td>
+                    <td>{{ ride_request.can_be_shared }}</td>
+                    <td>{{ ride_request.share_name }}</td>
+                    <td>{{ ride_request.current_passengers }}</td>
+                    <td>{{ ride_request.required_type }}</td>
+                    <td>{{ ride_request.special_requirement }}</td>
+                    <td>
+                      <a href="{% url 'comfirm-ride' ride_request.pk %}" class="btn btn-primary">Comfirm</a>
+                    </td>
+                  </tr>
+                <!--{% endif %}-->
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+ 
+
+  
+{% endblock %}

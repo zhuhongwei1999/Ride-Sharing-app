@@ -1,0 +1,16 @@
+{% extends 'users/base.html' %}
+{% block content %}
+
+<h3> {{user.username}}'s Profile </h3>
+
+<form method="POST" action="">
+    {% csrf_token %}
+    {{username_form.as_p}}
+    {% if user.profile.registered_driver %}
+        {{profile_form.as_p}}
+    {% endif %}
+    <input type="submit" name="Update info">
+</form>
+
+
+{% endblock %}

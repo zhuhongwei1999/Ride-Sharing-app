@@ -1,0 +1,73 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+
+  <h3>Confirmed Rides</h3>
+  <div id="accordion1">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Ride Owner</th>
+          <th>Sharers</th>
+          <th>Origin</th>
+          <th>Destination</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Special Requirements</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ride_request in ride_requests %}
+          {% if ride_request.ride_status == 'Ongoing' %}
+            <tr>
+              <td>{{ ride_request.user.username }}</td>
+              <td>{{ ride_request.share_name }}</td>
+              <td>{{ ride_request.origin }}</td>
+              <td>{{ ride_request.destination }}</td>
+              <td>{{ ride_request.date }}</td>
+              <td>{{ ride_request.time }}</td>
+              <td>{{ ride_request.special_requirement }}</td>
+              <td>
+                <a href="{% url 'complete-ride' ride_request.pk %}" class="btn btn-primary">Complete</a>
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
+  <h3>Completed Rides</h3>
+  <div id="accordion2">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Ride Owner</th>
+          <th>Sharers</th>
+          <th>Origin</th>
+          <th>Destination</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Special Requirements</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ride_request in ride_requests %}
+          {% if ride_request.ride_status == 'Completed' %}
+            <tr>
+              <td>{{ ride_request.user.username }}</td>
+              <td>{{ ride_request.share_name }}</td>
+              <td>{{ ride_request.origin }}</td>
+              <td>{{ ride_request.destination }}</td>
+              <td>{{ ride_request.date }}</td>
+              <td>{{ ride_request.time }}</td>
+              <td>{{ ride_request.special_requirement }}</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+ 
+{% endblock %}
