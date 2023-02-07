@@ -12,29 +12,12 @@ RIDE_STATUS_CHOICES = [
     ('Ongoing', 'Ongoing'),
     ('Completed', 'Completed'),
 ]
-
-class SearchRequest(models.Model):
-  user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-  destination = models.CharField(max_length=100)
-  earlydate = models.DateField()
-  earlytime = models.TimeField()
-  latedate = models.DateField()
-  latetime = models.TimeField()
-  seats_needed = models.PositiveSmallIntegerField()
-  
-  def __str__(self):
-    return f"Ride to {self.destination} between {self.earlydate} {self.earlytime} and {self.latedate} {self.latetime}"
-  
-  #def get_absolute_url(self):
-  #  return reverse('edit-request', kwargs={'pk': self.pk})
   
 class RideRequest(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
   origin = models.CharField(max_length=100)
   destination = models.CharField(max_length=100)
-  date = models.DateField()
-  time = models.TimeField()
-  date_time = models.DateTimeField(default=timezone.now)
+  date_time = models.DateTimeField()
   seats_needed = models.PositiveSmallIntegerField()
   driver_name = models.CharField(default='', max_length=50, blank=True)
   driver_license = models.CharField(default='', max_length=50, blank=True)
@@ -45,18 +28,30 @@ class RideRequest(models.Model):
     blank=True,
     null=True,
   )
-  required_type = models.CharField(max_length=20, choices=users_models.VEHICLE_TYPE, default='--')
+  sharer_information = models.JSONField(default=dict, blank=True)
+  required_type = models.CharField(max_length=20, choices=users_models.VEHICLE_TYPE, blank = True)
   special_requirement = models.TextField(blank=True, default='')
   created_at = models.DateTimeField(default=timezone.now)
   ride_status = models.CharField(max_length=10, choices=RIDE_STATUS_CHOICES, default='Open')
   current_passengers = models.SmallIntegerField(default=0)
 
   def __str__(self):
-    return f"Ride from {self.origin} to {self.destination} on {self.date}"
+    return f"Ride from {self.origin} to {self.destination} on {self.date_time}"
   
   def get_absolute_url(self):
     return reverse('edit-request', kwargs={'pk': self.pk})
+
+
+class SearchRequest(models.Model):
+  # ride_request = models.ForeignKey(RideRequest, on_delete=models.CASCADE, null=True)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+  destination = models.CharField(max_length=100)
+  early_datetime = models.DateTimeField()
+  late_datetime = models.DateTimeField()
+  seats_needed = models.PositiveSmallIntegerField()
   
-  def save(self, *args, **kwargs):
-    self.date_time = timezone.make_aware(datetime.combine(self.date, self.time))
-    super().save(*args, **kwargs)
+  def __str__(self):
+    return f"Ride to {self.destination} between {self.early_datetime} and {self.late_datetime}"
+  
+  #def get_absolute_url(self):
+  #  return reverse('edit-request', kwargs={'pk': self.pk})

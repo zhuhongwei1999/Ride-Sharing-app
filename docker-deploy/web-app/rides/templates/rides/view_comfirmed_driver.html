@@ -7,26 +7,30 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Ride Owner</th>
-          <th>Sharers</th>
           <th>Origin</th>
           <th>Destination</th>
-          <th>Date</th>
           <th>Time</th>
+          <th>Shared Passengers</th>
+          <th>Current Passengers</th>
+          <th>Vehicle Type</th>
           <th>Special Requirements</th>
+          <th>Driver's Name</th>
+          <th>Driver's License</th>
         </tr>
       </thead>
       <tbody>
         {% for ride_request in ride_requests %}
           {% if ride_request.ride_status == 'Ongoing' %}
             <tr>
-              <td>{{ ride_request.user.username }}</td>
-              <td>{{ ride_request.share_name }}</td>
               <td>{{ ride_request.origin }}</td>
               <td>{{ ride_request.destination }}</td>
-              <td>{{ ride_request.date }}</td>
-              <td>{{ ride_request.time }}</td>
+              <td>{{ ride_request.date_time }}</td>
+              <td>{{ ride_request.share_name }}</td>
+              <td>{{ ride_request.current_passengers }}</td>
+              <td>{{ ride_request.required_type }}</td>
               <td>{{ ride_request.special_requirement }}</td>
+              <td>{{ ride_request.driver_name }}</td>
+              <td>{{ ride_request.driver_license }}</td>
               <td>
                 <a href="{% url 'complete-ride' ride_request.pk %}" class="btn btn-primary">Complete</a>
               </td>
@@ -43,26 +47,32 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Ride Owner</th>
-          <th>Sharers</th>
           <th>Origin</th>
           <th>Destination</th>
-          <th>Date</th>
           <th>Time</th>
+          <th>Seats Needed</th>
+          <th>Can Be Shared</th>
+          <th>Vehicle Type</th>
           <th>Special Requirements</th>
+          <th>Driver's Name</th>
+          <th>Driver's License</th>
+          <th>Created At</th>
         </tr>
       </thead>
       <tbody>
         {% for ride_request in ride_requests %}
           {% if ride_request.ride_status == 'Completed' %}
             <tr>
-              <td>{{ ride_request.user.username }}</td>
-              <td>{{ ride_request.share_name }}</td>
               <td>{{ ride_request.origin }}</td>
               <td>{{ ride_request.destination }}</td>
-              <td>{{ ride_request.date }}</td>
-              <td>{{ ride_request.time }}</td>
+              <td>{{ ride_request.date_time }}</td>
+              <td>{{ ride_request.seats_needed }}</td>
+              <td>{{ ride_request.can_be_shared }}</td>
+              <td>{{ ride_request.required_type }}</td>
               <td>{{ ride_request.special_requirement }}</td>
+              <td>{{ ride_request.driver_name }}</td>
+              <td>{{ ride_request.driver_license }}</td>
+              <td>{{ ride_request.created_at }}</td>
             </tr>
           {% endif %}
         {% endfor %}

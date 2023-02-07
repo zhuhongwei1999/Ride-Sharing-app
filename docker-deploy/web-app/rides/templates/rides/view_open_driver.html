@@ -9,24 +9,22 @@
               <tr>
                 <th>Origin</th>
                 <th>Destination</th>
-                <th>Date</th>
                 <th>Time</th>
                 <th>Seats Needed</th>
                 <th>Can Be Shared</th>
                 <th>Shared Passengers</th>
                 <th>Current Passengers</th>
-                <th>Vehicle Type</th>
+                <th>Required Type</th>
                 <th>Special Requirements</th>
               </tr>
             </thead>
             <tbody>
               {% for ride_request in ride_requests %}
-                <!--{% if ride_request.user != driver.user %}-->
+                {% if ride_request.user != request.user %}
                   <tr>
                     <td>{{ ride_request.origin }}</td>
                     <td>{{ ride_request.destination }}</td>
-                    <td>{{ ride_request.date }}</td>
-                    <td>{{ ride_request.time }}</td>
+                    <td>{{ ride_request.date_time }}</td>
                     <td>{{ ride_request.seats_needed }}</td>
                     <td>{{ ride_request.can_be_shared }}</td>
                     <td>{{ ride_request.share_name }}</td>
@@ -37,7 +35,7 @@
                       <a href="{% url 'comfirm-ride' ride_request.pk %}" class="btn btn-primary">Comfirm</a>
                     </td>
                   </tr>
-                <!--{% endif %}-->
+                {% endif %}
               {% endfor %}
             </tbody>
           </table>

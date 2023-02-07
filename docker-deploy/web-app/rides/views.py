@@ -16,7 +16,6 @@ import datetime
 def home(request):
   return render(request, 'users/home.html')
 
-
 @login_required
 def submit_ride_request(request):
   if request.method == 'POST':
@@ -47,9 +46,6 @@ def shared_rides_view_sharer(request):
   context = {'ride_requests': ride_requests}
   return render(request, 'rides/view_shared_sharer.html', context)
   
-  
-  
-  
 @login_required
 # Driver: view open rides
 def search_rides_driver(request):
@@ -57,15 +53,14 @@ def search_rides_driver(request):
   if user_profile.registered_driver:
     driver = Profile.objects.filter(user=request.user).first()
     ride_requests = RideRequest.objects.filter(Q(special_requirement = driver.special_info) | Q(special_requirement = ''),
+                                               Q(required_type = driver.vehicle_type)|Q(required_type = ''),
                                                ride_status = 'Open',
-                                               required_type = driver.vehicle_type,
-                                               current_passengers__lte = driver.max_passengers) 
+                                               current_passengers__lte = driver.max_passengers)
+    ride_requests = ride_requests.exclude(share_name__contains = [request.user.username])
+    
     #special request
     context = {'ride_requests': ride_requests}
     return render(request, 'rides/view_open_driver.html', context)
-
-
-
 
 @login_required
 # Driver: view comfirmed rides
@@ -81,8 +76,7 @@ class EditRideRequestView(UpdateView):
   fields = [
     'origin',
     'destination',
-    'date',
-    'time',
+    'date_time',
     'seats_needed',
     'can_be_shared',
     'required_type',
@@ -93,19 +87,18 @@ class EditRideRequestView(UpdateView):
     return get_object_or_404(RideRequest, pk=self.kwargs['pk'])
   
   def form_valid(self, form):
+    ride_request = form.save()
+    sharer_info = ride_request.sharer_information
+    sharer_names = list(sharer_info.keys())
+    for sharer_name in sharer_names:
+      email = sharer_info[sharer_name]['email']
+      send_cancel_email(email, ride_request.__str__())
+      del ride_request.sharer_information[sharer_name]
+    ride_request.share_name = None
+    ride_request.current_passengers = ride_request.seats_needed
+    ride_request.save()
     messages.success(self.request, 'Ride request updated successfully!')
     return super().form_valid(form)
-  
-# cancel for sharers after edit
-'''
-  def get(self, request, pk):
-    ride_request = get_object_or_404(RideRequest, pk=pk)
-    #for sharer in ride_request.share_name:
-    #  sharer_object = Profile.objects.filter(user = sharer)  ##### user.name??
-    #  send_cancel_email(sharer_object.user.email, ride_request.__str__())
-    ride_request.share_name = None
-    ride_request.save()
-'''
 
 def send_cancel_email(user_email, request_details):
     subject = 'Ride Canceled'
@@ -128,9 +121,13 @@ class ComfirmRideRequest(View):
     ride_request.ride_status = 'Ongoing'
     ride_request.driver_name = request.user.username
     ride_request.driver_license = driver.license_plate
+    if ride_request.required_type == '':
+      ride_request.required_type = driver.vehicle_type
     ride_request.save()
-    #email
-    #send_confirmation_email(ride_request.user.email, ride_request.__str__())
+    send_confirmation_email(ride_request.user.email, ride_request.__str__())
+    for name in ride_request.share_name:
+      email = ride_request.sharer_information[name]['email']
+      send_confirmation_email(email, ride_request.__str__())   
     messages.success(request, 'You have successfully comfirmed the ride.')
     return redirect('/view-comfirmed-rides/')
 
@@ -151,7 +148,6 @@ class CancelRideRequestView(View):
     messages.success(request, 'The ride request has been successfully cancelled.')
     return redirect('/')
   
-
 @login_required
 # Sharer: search open rides
 def search_rides_sharer(request):
@@ -161,62 +157,42 @@ def search_rides_sharer(request):
       search_request = form.save(commit=False)
       search_request.user = request.user
       search_request.save()
-      
       ride_requests = RideRequest.objects.filter(ride_status = 'Open', 
                                                 can_be_shared = True,
                                                 destination = search_request.destination,
-                                                date__gte = search_request.earlydate,
-                                                date__lte = search_request.latedate,
-                                                time__gte = search_request.earlytime,
-                                                time__lte = search_request.latetime,)
-    context = {'form': form,'ride_requests': ride_requests}
+                                                date_time__range = (search_request.early_datetime, search_request.late_datetime),)
+      ride_requests = ride_requests.exclude(share_name__contains = [request.user.username])
+    context = {'form': form,'ride_requests': ride_requests, 'search_request': search_request}
     return render(request, 'rides/view_open_sharer.html', context)
   else:
     form = SearchForm()
     context = {'form': form}
     return render(request, 'rides/view_open_sharer.html', context)
   
-  
 class JoinRideRequest(View):
   def get(self, request, pk):
     ride_request = get_object_or_404(RideRequest, pk=pk)
     search_object = SearchRequest.objects.filter(user=request.user).last()
-    print(search_object)
-    print(ride_request)
     sharer = Profile.objects.filter(user=request.user).first()
     if ride_request.share_name is None:
       ride_request.share_name = []
     ride_request.share_name.append(sharer.user.username)
     ride_request.current_passengers += search_object.seats_needed
+    sharer_info = {sharer.user.username: {'email': sharer.user.email, 'seats_needed': search_object.seats_needed}}
+    ride_request.sharer_information.update(sharer_info)
     ride_request.save()
     messages.success(request, 'You have successfully joined the ride.')
     return redirect('/view-shared-rides/')
-  
 
 class ExitRideRequest(View):
   def get(self, request, pk):
     ride_request = get_object_or_404(RideRequest, pk=pk)
     sharer = Profile.objects.filter(user=request.user).first()
-    join_request = SearchRequest.objects.filter(user=request.user,destination = ride_request.destination).first()###
+    ride_request.current_passengers -= ride_request.sharer_information[sharer.user.username]['seats_needed']
+    del ride_request.sharer_information[sharer.user.username]
     ride_request.share_name.remove(sharer.user.username)
-    if ride_request.share_name is []:
+    if ride_request.share_name == []:
       ride_request.share_name = None
-    ride_request.current_passengers -= join_request.seats_needed
     ride_request.save()
     messages.success(request, 'You have successfully exit this ride.')
     return redirect('/')
-  
-
-  
-
-
-
-
-
-
-
-
-
-
-
-  

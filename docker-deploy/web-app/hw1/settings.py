@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'hw1.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ridedb',
+        'NAME': 'mydb',
         'USER': 'hongwei',
         'PASSWORD': 'hongwei',
         'HOST': '127.0.0.1',

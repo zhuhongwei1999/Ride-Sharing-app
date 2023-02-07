@@ -1,24 +1,21 @@
 from django import forms
 from .models import RideRequest,SearchRequest
-import datetime
+from datetime import datetime
 from django.core.exceptions import ValidationError
 import pytz
 from django.conf import settings
+from django.utils import timezone
 
 class SearchForm(forms.ModelForm):
   class Meta:
     model = SearchRequest
     fields = ['destination',
-              'earlydate',
-              'earlytime',
-              'latedate',
-              'latetime',
+              'early_datetime',
+              'late_datetime',
               'seats_needed',]
     widgets = {
-      'earlydate': forms.DateInput(attrs={'type': 'date'}),
-      'earlytime': forms.TimeInput(attrs={'type': 'time'}),
-      'latedate': forms.DateInput(attrs={'type': 'date'}),
-      'latetime': forms.TimeInput(attrs={'type': 'time'}),
+      'early_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+      'late_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
     }
     
     
@@ -27,25 +24,18 @@ class RideRequestForm(forms.ModelForm):
     model = RideRequest
     fields = ['origin', 
               'destination', 
-              'date', 
-              'time', 
+              'date_time',
               'seats_needed',
               'can_be_shared',
               'required_type',
               'special_requirement',]
     widgets = {
-      'date': forms.DateInput(attrs={'type': 'date'}),
-      'time': forms.TimeInput(attrs={'type': 'time'}),
+      'date_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
     }
     
   def clean(self):
-    cleaned_data = super().clean()
-    date = cleaned_data.get('date')
-    time = cleaned_data.get('time')
-    if date and time:
-      tz = pytz.timezone(settings.TIME_ZONE)
-      now = tz.localize(datetime.datetime.now())
-      min_datetime = datetime.datetime.combine(now.date(), now.time())
-      input_datetime = datetime.datetime.combine(date, time)
-      if input_datetime < min_datetime:
-        raise ValidationError("Date and time must not be earlier than the current date and time.")
+    date_time = self.cleaned_data['date_time']
+    tz = pytz.timezone(settings.TIME_ZONE)
+    now = timezone.now().astimezone(tz)
+    if date_time <= now:
+      raise ValidationError("Date and time must be in the future.")

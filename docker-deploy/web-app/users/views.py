@@ -45,7 +45,7 @@ def driver_update(request):
     if profile_form.is_valid() and username_form.is_valid():
       profile_form.save()
       username_form.save()
-      messages.success(request, 'Driver info updated!')
+      messages.success(request, 'Your info has been updated!')
       return redirect('/')  
   else:
     profile_form = ProfileForm(instance=request.user.profile)

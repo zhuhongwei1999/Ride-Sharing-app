@@ -19,13 +19,12 @@
               <tr>
                 <th>Origin</th>
                 <th>Destination</th>
-                <th>Date</th>
                 <th>Time</th>
                 <th>Seats Needed</th>
                 <th>Can Be Shared</th>
                 <th>Shared Passengers</th>
                 <th>Current Passengers</th>
-                <th>Vehicle Type</th>
+                <th>Required Type</th>
                 <th>Special Requirements</th>
               </tr>
             </thead>
@@ -35,8 +34,7 @@
                   <tr>
                     <td>{{ ride_request.origin }}</td>
                     <td>{{ ride_request.destination }}</td>
-                    <td>{{ ride_request.date }}</td>
-                    <td>{{ ride_request.time }}</td>
+                    <td>{{ ride_request.date_time }}</td>
                     <td>{{ ride_request.seats_needed }}</td>
                     <td>{{ ride_request.can_be_shared }}</td>
                     <td>{{ ride_request.share_name }}</td>
@@ -75,15 +73,13 @@
               <tr>
                 <th>Origin</th>
                 <th>Destination</th>
-                <th>Date</th>
                 <th>Time</th>
-                <th>Seats Needed</th>
-                <th>Can Be Shared</th>
+                <th>Shared Passengers</th>
+                <th>Current Passengers</th>
                 <th>Vehicle Type</th>
                 <th>Special Requirements</th>
-                <th>Created At</th>
-                <th>Driver's name</th>
-                <th>License</th>
+                <th>Driver's Name</th>
+                <th>Driver's License</th>
               </tr>
             </thead>
             <tbody>
@@ -92,13 +88,11 @@
                   <tr>
                     <td>{{ ride_request.origin }}</td>
                     <td>{{ ride_request.destination }}</td>
-                    <td>{{ ride_request.date }}</td>
-                    <td>{{ ride_request.time }}</td>
-                    <td>{{ ride_request.seats_needed }}</td>
-                    <td>{{ ride_request.can_be_shared }}</td>
+                    <td>{{ ride_request.date_time }}</td>
+                    <td>{{ ride_request.share_name }}</td>
+                    <td>{{ ride_request.current_passengers }}</td>
                     <td>{{ ride_request.required_type }}</td>
                     <td>{{ ride_request.special_requirement }}</td>
-                    <td>{{ ride_request.created_at }}</td>
                     <td>{{ ride_request.driver_name }}</td>
                     <td>{{ ride_request.driver_license }}</td>
                   </tr>
@@ -127,12 +121,13 @@
               <tr>
                 <th>Origin</th>
                 <th>Destination</th>
-                <th>Date</th>
                 <th>Time</th>
                 <th>Seats Needed</th>
                 <th>Can Be Shared</th>
                 <th>Vehicle Type</th>
                 <th>Special Requirements</th>
+                <th>Driver's Name</th>
+                <th>Driver's License</th>
                 <th>Created At</th>
               </tr>
             </thead>
@@ -142,12 +137,13 @@
                   <tr>
                     <td>{{ ride_request.origin }}</td>
                     <td>{{ ride_request.destination }}</td>
-                    <td>{{ ride_request.date }}</td>
-                    <td>{{ ride_request.time }}</td>
+                    <td>{{ ride_request.date_time }}</td>
                     <td>{{ ride_request.seats_needed }}</td>
                     <td>{{ ride_request.can_be_shared }}</td>
                     <td>{{ ride_request.required_type }}</td>
                     <td>{{ ride_request.special_requirement }}</td>
+                    <td>{{ ride_request.driver_name }}</td>
+                    <td>{{ ride_request.driver_license }}</td>
                     <td>{{ ride_request.created_at }}</td>
                   </tr>
                 {% endif %}
